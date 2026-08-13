@@ -11,9 +11,9 @@ db_password = os.getenv("DB_PASSWORD")
 
 def conectar():
     return connect(
-        dbhost= db_host,
+        host= db_host,
         port= db_port,
-        name= db_name,
+        dbname= db_name,
         user= db_user,
         password= db_password
     )
