@@ -17,3 +17,8 @@ def conectar():
         user= db_user,
         password= db_password
     )
+
+if __name__ == "__main__":
+    conexao = conectar()
+    print("conexao realizada com sucesso")
+    

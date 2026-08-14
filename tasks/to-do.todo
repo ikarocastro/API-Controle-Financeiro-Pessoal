@@ -1,1 +1,9 @@
-TODO: OPEN
+API-Financeira-Pessoal: 
+    ✔ Terminar conexao com banco de dados @done(26-08-14 06:15)
+    ✔ Terminar de modelar as tabelas das entidades @done(26-08-14 06:31)
+    ✔ Adicionar o estudo do (if __name__ == "__main__") @done(26-08-14 11:41)
+    ✔ Começar a trabalhar no Repository
+
+ Check:
+    ✔ Ajustar a documentacao do projeto
+    ☐ Revisar os conceitos da arquitetura e do funcionamento do projeto

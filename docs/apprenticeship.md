@@ -98,3 +98,159 @@ def calcular_saldo(transacoes):
 O python-dotenv funciona assim: você chama uma ``função load_dotenv()`` (que lê o arquivo .env e "injeta" as variáveis no ambiente), e depois usa ``os.getenv("NOME_DA_CHAVE")`` pra pegar o valor de cada uma.
 
 - Separar ``"como conectar"`` de ``"o que fazer com a conexão"`` também é uma responsabilidade própria.
+
+
+# variável especial chamada
+
+```
+if __name__ == "__main__":
+    conexao = conectar()
+    print("Conectado com sucesso!")
+```
+
+## O problema que isso resolve
+
+Todo módulo Python tem uma variável especial chamada __name__, que o próprio Python preenche automaticamente. O valor dela muda dependendo de como o arquivo foi executado:
+
+Se você rodar o arquivo diretamente (ex: python config.py no terminal), o Python define __name__ = "__main__".
+Se esse arquivo for importado por outro arquivo (ex: outro código faz from config import conectar), o Python define __name__ = "config" (o nome do próprio módulo) — não "__main__".
+
+Por que isso importa pro seu caso
+
+Você vai, mais pra frente, importar conectar() dentro do seu Repository (from config import conectar). Se você tivesse escrito conexao = conectar() e print(...) soltos no arquivo (sem o if), isso executaria toda vez que qualquer outro arquivo importasse config.py — mesmo que ninguém quisesse testar conexão naquele momento, só quisesse usar a função.
+
+O if __name__ == "__main__": cria uma zona de código que só roda quando você executa esse arquivo específico diretamente — serve como uma área de teste isolada, que fica "desligada" quando o arquivo é usado como peça de outro código maior.
+
+Faz sentido a diferença entre "rodar o arquivo direto" versus "importar o arquivo de dentro de outro"? Corrige o dbname e adiciona esse bloco de teste no final do config.py, depois roda o arquivo direto no terminal (py src/database/config.py, ajustando o caminho conforme sua estrutura) pra ver se conecta de verdade.
+
+# Como previnir o SQL Injection
+
+- SQL Injection, e é um dos mais conhecidos e perigosos da área.
+
+- Imagina que alguém, em vez de digitar um nome normal, digite isto como "nome da conta":
+
+```
+Ikaro'); DROP TABLE conta; --
+```
+
+- Se você tivesse usado aquele ``f"INSERT INTO conta (nome) VALUES ('{nome_digitado}')"``, a string final montada seria:
+
+```
+INSERT INTO conta (nome) VALUES ('Ikaro'); DROP TABLE conta; --')
+```
+- Repara: as aspas simples que a pessoa digitou fecham a string antes da hora, e o que vem depois (``DROP TABLE conta``) vira um comando SQL novo e válido, que o banco executa — nesse exemplo, apagando sua tabela inteira. O -- no final comenta o resto, pra evitar erro de sintaxe. Esse é o ataque clássico.
+
+# A solução: parâmetros preparados (prepared statements)
+
+- Em vez de "montar" a query colando texto direto (``f"..."``), o ``psycopg2`` te dá um jeito de passar os valores separados da query, usando ``%s`` como marcador de posição:
+
+```
+cursor.execute("INSERT INTO conta (nome) VALUES (%s)", (nome_digitado,))
+```
+
+- Aqui, o ``psycopg2`` sabe que tudo que estiver no lugar do ``%s`` é dado, nunca comando — então mesmo que alguém digite aspas ou ``DROP TABLE``, isso é tratado como texto puro, sem nenhum efeito de "quebrar" a query.
+
+# O que é um cursor
+
+- Quando você chama ``conectar()``, você recebe uma conexão com o banco — é como uma "linha telefônica aberta" com o Postgres. Mas só ter a linha aberta não é suficiente pra "falar" com o banco — você precisa de algo que realmente envie comandos e receba respostas através dessa conexão.
+
+- O cursor é exatamente isso: é o objeto que você usa pra executar queries SQL e navegar pelos resultados que voltam (no caso de um SELECT). Pensa nele como o "microfone" daquela ligação — a conexão é o cabo, o cursor é por onde a comunicação de fato acontece.
+
+# Uso na prática
+
+```
+conexao = conectar()
+cursor = conexao.cursor()
+
+cursor.execute("INSERT INTO conta (nome) VALUES (%s)", (nome,))
+
+conexao.commit()  # confirma a alteração de verdade no banco
+cursor.close()
+conexao.close()
+```
+
+## Alguns pontos importantes
+
+1. ``conexao.cursor()`` cria o cursor a partir da conexão já aberta.
+2. ``cursor.execute(...)`` roda a query, com o ``%s`` sendo substituído com segurança pelo valor de ``nome`` (lembra da proteção contra SQL Injection que acabamos de ver).
+3. ``conexao.commit()`` é essencial pra INSERT/UPDATE/DELETE — sem isso, o Postgres trata a alteração como "pendente" e ela não fica salva de verdade. (Pra ``SELECT``, não precisa de commit, porque você só está lendo, não alterando nada.)
+4. No final, é boa prática fechar o cursor e a conexão, pra não deixar recursos abertos sem necessidade
+
+# Começo do Repository
+
+- Para criarmos a nossa conexão com o banco precisamos criar nossas sequencias de código
+- Seguimos os determinados passos para esse processo:
+
+1. Abrir a conexão ``(conectar())``
+2. Criar o cursor
+3. Executar o ``INSERT INTO conta (nome) VALUES (%s) RETURNING id``, passando o ``nome`` recebido como parâmetro
+4. Pegar o ``id`` que voltou do ``RETURNING``
+5. Fechar tudo (commit, cursor, conexão)
+6. Montar e devolver um objeto ``Conta(id=..., nome=...)``
+
+- Primeiro precisamos da nossa conexão:
+
+```
+from database import conectar()
+
+conexao = conectar()
+```
+
+- importamos de onde está nossa fução de conexão
+- depois colocamos o conecar dentro da função criar_conta
+
+- Depois criamos o cursor logo a seguir 
+
+```
+curso = conexao.cursor()
+```
+
+- Em seguida dentro da função executamos o comando ``cursor.execute``
+
+```
+    cursor.execute("INSERT INTO conta (nome) VALUES (%s) RETURNING id)", (nome,))
+```
+
+- Depois criamos o ``fetchone`` para retornar nosso ID
+
+```
+    conta_id = cursor.fetchone()[0] 
+```
+
+- Depois adicionamos o commit se não as alterações não serão salvas
+
+```
+    conexao.commit()
+```
+
+- Nós adicionamos os comandos para sair da funão:
+
+```
+curso.close()
+conexao.close()
+```
+
+- E por fim retornamos os dados da conta:
+
+```
+return Conta(id=id_gerado, nome=nome)
+```
+
+- Lembrando que precisamos importar nosso objeto Conta de Conta_entidadades.py
+
+- Agora vamos testar com uma função de teste!
+- Uma forma rápida de testar: adiciona, temporariamente, no final do arquivo (fora da função, sem indentação):
+
+```
+if = __name__ == "__main":
+    nova_conta = criar_conta("Teste")
+    print("Nova Conta")
+```
+
+- Depois temos que conferiri se o venv está ativo no terminal
+- Se não estiver ativo só rodar o comando novamente para ativar:
+
+```
+source .venv/bin/activate
+```
+

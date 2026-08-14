@@ -131,3 +131,7 @@ pip freeze > requirements.txt
 Agora vamos usar essas variáveis pra realmente abrir a conexão com o ``connect`` do psycopg2. A função connect recebe esses parâmetros como argumentos nomeados: ``host``, ``port``, ``dbname``, ``user``, ``password``.
 
 - ``encapsular`` numa função dá controle sobre quando a conexão acontece, em vez de ser um efeito colateral automático de só importar o arquivo.
+
+## Repository
+
+- o Repository é a peça que vai usar a função conectar() do config.py pra realmente conversar com o banco — inserir uma Conta nova, buscar transações de uma conta, etc. — sem que o Domain/ (suas classes Conta, Transacao, TipoTransacao) precise saber nada sobre Postgres.
