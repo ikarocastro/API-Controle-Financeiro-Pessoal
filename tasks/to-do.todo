@@ -6,4 +6,6 @@ API-Financeira-Pessoal:
 
  Check:
     ✔ Ajustar a documentacao do projeto
-    ☐ Revisar os conceitos da arquitetura e do funcionamento do projeto
+    ✔ Revisar os conceitos da arquitetura e do funcionamento do projeto @done(26-08-14 20:34)
+    ☐ Criar e terminar a Repository Transacao
+    ☐ Ajusatar a nova modificacao no documento de arquitetura do projeto

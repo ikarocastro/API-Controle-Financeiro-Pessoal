@@ -276,3 +276,39 @@ if __name__ == "__main__":
 ```
 
 - Ela trouxe todos os parâmetros da nossa entidade
+
+## Criando Repository para buscar por ID
+
+- Diferente do ``INSERT`` para inserir um novo valor a tabela para buscar algo usamos o comando sql ``SELECT```
+
+- pra buscar uma conta específica pelo id, você precisa de duas partes na query — quais colunas você quer trazer de volta, e uma condição pra filtrar só a linha certa (não a tabela inteira). Lembra da sintaxe geral:
+
+```
+SELECT colunas FROM tabela WHERE condição;
+```
+- Para retornar por ``id`` e se proteger contra SQL Ijection usaremos o comando da seguinte forma:
+
+```
+SELECT * FROM conta WHERE id = %s
+```
+
+- ``SELECT *`` traz todas as colunas, e ``WHERE id = %s`` filtra pela conta certa, com o valor sendo passado de forma segura (protegido contra SQL Injection).
+
+- Criando a funcão:
+
+Não precisa de ``commit()``
+Lembra que ``commit()`` só é necessário quando você altera dados (``INSERT``, ``UPDATE``, ``DELETE``)? Um ``SELECT`` só lê, não muda nada no banco — então não tem nada pra "confirmar".
+
+2. ``fetchone()`` aqui devolve a linha inteira, não só um valor
+Na ``criar_conta``, você usou ``fetchone()[0]`` porque o ``RETURNING id`` só devolvia uma coluna (o id). Aqui, como você pediu ``SELECT *``, o ``fetchone()`` vai devolver uma tupla com todos os valores da linha — algo como ``(1, 'Ikaro')``. Você vai precisar pegar duas posições dessa tupla (``[0]`` pro id, ``[1]`` pro nome), não só uma.
+
+3. E se a conta não existir?
+Pensa nisso: se você buscar um ``id`` que não existe no banco, o que ``cursor.fetchone()`` devolve? (dica: quando não há nenhuma linha correspondente, ``fetchone()`` devolve ``None``, não uma tupla vazia). Isso significa que, antes de tentar acessar ``resultado[0]`` e ``resultado[1]``, você precisa verificar se o resultado não é ``None`` — senão, tentar acessar ``None[0]`` vai gerar um erro.
+
+Pensando nisso: se a conta não for encontrada, o que você acha que a função ``buscar_conta_por_id`` deveria fazer — devolver ``None`` (avisando "não achei nada"), ou lançar algum tipo de erro (parecido com o ``ValueError`` que criamos na regra de "valor não pode ser negativo")
+
+### Regra 
+
+```
+A regra geral em Python: tudo que uma função usa precisa já estar definido antes de ela ser chamada (não necessariamente antes de ser definida, mas com certeza antes de ser executada).
+```
