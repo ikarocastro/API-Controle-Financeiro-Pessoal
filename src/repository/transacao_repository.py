@@ -13,6 +13,21 @@ def criar_transacao(descricao, valor, conta_id, data, tipo, categoria):
     conexao.close()
     return Transacao(id = transacao_id, descricao = descricao, valor = valor, data = data, tipo = tipo, categoria = categoria)
 
+
+def listar_transacoes_por_conta(conta_id):
+    conexao = conectar()
+    cursor = conexao.cursor()
+    cursor.execute("SELECT * FROM transacao WHERE conta_id = %s", (conta_id,))
+    resultados = cursor.fetchall()
+    transacoes = [] # Criando a lista de objetos
+    for resultado in resultados:
+        transacao = Transacao(id=resultado[0], descricao=resultado[2], valor=resultado[3], data=resultado[5], tipo=TipoTransacao(resultado[6]), categoria=resultado[4])
+        transacoes.append(transacao)
+    cursor.close()
+    conexao.close()
+    return transacoes
+
 if __name__ == "__main__":
-    nova_transacao = criar_transacao("Teste", 100.0, 1, date(2024, 8, 26), TipoTransacao.ENTRADA, "Salário")
-    print(nova_transacao)
+    transacoes_da_conta = listar_transacoes_por_conta(1)
+for t in transacoes_da_conta:
+    print(t)

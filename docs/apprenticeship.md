@@ -312,3 +312,28 @@ Pensando nisso: se a conta não for encontrada, o que você acha que a função 
 ```
 A regra geral em Python: tudo que uma função usa precisa já estar definido antes de ela ser chamada (não necessariamente antes de ser definida, mas com certeza antes de ser executada).
 ```
+
+## Criando Repository para buscar por contas
+
+- ``buscar_conta_por_id`` usava ``cursor.fetchone()``, porque só esperava uma linha de resultado (ou nenhuma). Aqui, você espera múltiplas linhas — todas as transações daquela conta.
+
+- ``fetchall()`` funciona parecido com ``fetchone()``, mas em vez de devolver uma tupla (ou None), ele devolve uma lista de tuplas — uma tupla pra cada linha que a query encontrou. Se não encontrar nenhuma linha, ele devolve uma lista vazia (``[]``), não ``None`` — essa é uma diferença importante em relação ao ``fetchone()``.
+
+- Exemplo, se a conta 1 tiver 3 transações, cursor.fetchall() devolveria algo como:
+
+```
+[
+    (1, 1, 'Salário', 100.0, ..., 'Entrada'),
+    (2, 1, 'Lanche', 15.0, ..., 'saida'),
+    (3, 1, 'Ônibus', 5.0, ..., 'saida'),
+]
+```
+
+- em vez de tratar um resultado, você precisa percorrer cada tupla dessa lista e transformar cada uma num objeto ``Transacao``
+
+Busca todas as ``transações de uma conta`` com ``SELECT ... WHERE conta_id = %s``
+- Usa ``fetchall()`` em vez de ``fetchone()`` — traz várias linhas de uma vez, numa lista de tuplas (fetchone() só serve pra uma linha ou None)
+- Percorre os resultados com um ``for``, montando um ``objeto Transacao`` pra cada linha e adicionando numa lista com ``.append()``
+- tipo precisa ser reconstruído do ``Enum``: o banco guarda como string (``"Entrada"``), então a volta é ``TipoTransacao(resultado[6])``
+- Testado com sucesso: retornou as 2 transações de teste da conta 1, com todos os campos corretos (incluindo valor já vindo como Decimal)
+
