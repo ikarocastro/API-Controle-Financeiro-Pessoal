@@ -1,5 +1,5 @@
-from database import conectar
-from Domain.conta_entidades import Conta
+from ..database.config import conectar
+from ..Domain.conta_entidades import Conta
 
 def criar_conta(nome):
     conexao = conectar()
@@ -13,4 +13,4 @@ def criar_conta(nome):
 
 if __name__ == "__main__":
     nova_conta = criar_conta("Teste")
-    print("Nova Conta")
+    print(nova_conta)

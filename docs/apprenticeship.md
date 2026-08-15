@@ -254,3 +254,25 @@ if = __name__ == "__main":
 source .venv/bin/activate
 ```
 
+# Criando Repository Transação 
+
+- Primeiro importamos a conexão com a função ``conectar()```
+- Depois fazemos tambem para importa nossa entidade
+- logo após precisamos importar tambem o modulo ``datetime``` para retornarmos a parte da data
+- depois precisamos tambem importar o tipo da transação do nosso objeto
+
+- Seguimos tambem nossa sequencia de criação do padrão solido:
+
+```
+(conectar → cursor → execute com %s → fetchone → commit → close → devolver objeto de domínio)
+```
+
+- Logo depois criamos nosso código padão de testes para testarmos se a criação funcionou
+
+```
+if __name__ == "__main__":
+    nova_transacao = criar_transacao("Teste", 100.0, 1, date(2024, 8, 26), TipoTransacao.ENTRADA, "Salário")
+    print(nova_transacao)
+```
+
+- Ela trouxe todos os parâmetros da nossa entidade
