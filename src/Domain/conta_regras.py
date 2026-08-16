@@ -1,4 +1,4 @@
-from transacao_entidades import TipoTransacao
+from .transacao_entidades import TipoTransacao
 
 def calcular_saldo(transacoes):
     saldo = 0

@@ -135,3 +135,9 @@ Agora vamos usar essas variáveis pra realmente abrir a conexão com o ``connect
 ## Repository
 
 - o Repository é a peça que vai usar a função conectar() do config.py pra realmente conversar com o banco — inserir uma Conta nova, buscar transações de uma conta, etc. — sem que o Domain/ (suas classes Conta, Transacao, TipoTransacao) precise saber nada sobre Postgres.
+
+# Test
+
+- ``teste`` não pertence a nenhuma das duas camadas, então merece viver em outro lugar, não misturado com o código de produção do ``Repository`` ou do ``Domínio.`` 
+
+- separar ``src/`` (código-fonte de produção) de uma área de testes é exatamente como projetos profissionais se organizam. ``src/`` fica "puro", só com o que realmente compõe o sistema.

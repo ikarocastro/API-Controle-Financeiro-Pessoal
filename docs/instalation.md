@@ -16,7 +16,7 @@ python3 -m venv venv
 source venv/bin/activate
 ````
 
-3. Instalar as dependências — de uma vez, usando o ``requirements.txt```
+3. Instalar as dependências — de uma vez, usando o ``requirements.txt``
 
 ```
 pip install -r requirements.txt

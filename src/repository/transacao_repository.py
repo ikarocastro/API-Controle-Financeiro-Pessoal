@@ -29,5 +29,5 @@ def listar_transacoes_por_conta(conta_id):
 
 if __name__ == "__main__":
     transacoes_da_conta = listar_transacoes_por_conta(1)
-for t in transacoes_da_conta:
-    print(t)
+    for t in transacoes_da_conta:
+        print(t)

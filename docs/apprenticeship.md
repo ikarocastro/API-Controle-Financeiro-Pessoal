@@ -337,3 +337,85 @@ Busca todas as ``transações de uma conta`` com ``SELECT ... WHERE conta_id = %
 - tipo precisa ser reconstruído do ``Enum``: o banco guarda como string (``"Entrada"``), então a volta é ``TipoTransacao(resultado[6])``
 - Testado com sucesso: retornou as 2 transações de teste da conta 1, com todos os campos corretos (incluindo valor já vindo como Decimal)
 
+---
+
+# Rodar como módulo (para imports funcionarem certo)
+
+- Como separei a pasta de teste fora de src, como rodar o arquivo para testar se o calculo das transações está funcionando? 
+
+- Esse arquivo novo está fora de ``src/``, então ele não pode mais usar aqueles imports relativos com ``..`` (que só funcionam dentro de um pacote). Como esse arquivo vai importar ``listar_transacoes_por_conta`` (que mora em ``src/repository/transacao_repository.py``) e ``calcular_saldo`` (em ``src/Domain/conta_regras.py``)?
+
+1. Isso vai exigir um ``import absoluto``, começando a partir de ``src``, tipo:
+
+```
+from src.repository.transacao_repository import listar_transacoes_por_conta
+from src.Domain.conta_regras import calcular_saldo
+```
+
+- Só que pra isso funcionar, o Python precisa executar esse arquivo a partir da raiz do projeto (não de dentro de ``testes/``), do mesmo jeito que fazíamos com ``-m src.repository....`` Como você acha que ficaria o comando pra rodar esse novo arquivo, sabendo que ele mora em ``testes/teste_saldo.py`` e você quer rodar a partir da raiz?
+
+- ``tests/`` é irmã de ``src/``ou seja elas estão no mesmo nível de estrutura, então o caminho do módulo deveria começar direto por ``testes``, sem passar por src
+
+```
+python3 -m testes.teste_saldo
+```
+
+- Isso, combinado com o import absoluto que você vai escrever dentro do arquivo (``from src.repository... import ...``), reflete a estrutura real: a partir da raiz do projeto, existem duas pastas irmãs, ``src/`` e ``testes/``, e o Python "enxerga" as duas quando você roda o comando de dentro da raiz.
+
+# Montar o teste_saldo.py
+
+- Meu raciocínio:
+
+1. Buscar as transações de uma conta que já existe (você tem a conta 1, que já tem 2 transações de teste)
+2. Passar essa lista pro calcular_saldo
+3. Imprimir o resultado, pra você conferir se bate com o que você espera manualmente
+
+# Pytest
+
+- Para podermos testar se a função de ``testar_saldo``está funcionando podemos usar uma ferramenta no python chamada ``pytest```
+
+- ``pytest`` é uma ferramenta de testes pra Python — provavelmente a mais usada do mercado. A ideia central dela é simples: em vez de você escrever manualmente "roda essa função, confere se deu certo, imprime alguma coisa se falhar", o ``pytest`` faz isso tudo por você, de forma padronizada.
+
+## Como funciona na prática:
+
+1. Qualquer função cujo nome comece com test_ (exatamente como você já nomeou a sua, test_calcular_saldo) é automaticamente reconhecida como um teste.
+2. Você não precisa de if __name__ == "__main__": nem chamar a função manualmente — o pytest varre os arquivos, encontra as funções test_*, e executa todas.
+3. Quando um assert dentro do teste falha, o pytest te mostra uma mensagem bem detalhada: qual valor era esperado, qual valor realmente veio, e em que linha — muito mais claro que um erro genérico de AssertionError.
+4. Se tudo passar, ele mostra um resumo verde, tipo "1 passed".
+
+## Como se usa:
+
+Instala com ``pip install pytest`` (mais uma linha no seu requirements.txt)
+Roda no terminal, na raiz do projeto: ``pytest`` (sozinho, sem precisar apontar arquivo nenhum — ele encontra os testes automaticamente)
+
+- Por que isso ``importa pro seu projeto``: conforme você for adicionando mais ``regras de negócio (validação de valor negativo, cálculo de saldo, futuras regras)``, você vai acumular vários testes. Rodar todos eles de uma vez com um comando só ``(pytest)``, em vez de executar arquivo por arquivo manualmente, economiza bastante tempo — e vira um hábito valioso pra qualquer projeto sério, incluindo os que você vai construir pensando numa vaga de desenvolvedor.
+
+- Começamos instalando ele pelo terminal, lembrar do ``.venv`` ativo no termina!
+
+```
+pip install pytest
+or
+python3 -m pip install pytest
+```
+
+- Depois de instalado, atualiza o ``requirements.txt``
+
+```
+pip freeze > requirements.txt
+or 
+python3 -m pip freeze > requirements.txt
+```
+
+- Com isso feito, você não precisa mais do ``if __name__ == "__main__"``: nesse arquivo — o ``pytest`` vai descobrir a função ``test_calcular_saldo`` sozinho, só pelo nome dela. Pode deixar o arquivo só com os dois imports e a função `test_calcular_saldo()`, sem nenhum bloco de execução manual.
+
+- Ai só rodar o pytest a partir da raiz do projeto:
+
+```
+pytest
+```
+- você não usa ``-m`` nem precisa apontar o caminho do arquivo — o ``pytest`` varre o projeto inteiro procurando por arquivos e funções de teste automaticamente
+
+- o pytest `"descobre"` arquivos de teste — ele não varre qualquer arquivo `.py`, ele procura por um padrão de nome.
+
+- Por padrão, o `pytest` só reconhece arquivos que começam com `test_` ou terminam com `_test.py`.
+
