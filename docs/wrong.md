@@ -38,3 +38,22 @@ conta_repository é um módulo dentro desse pacote
 Cada `__init__.py` (em `src/`, `src/database/`, `src/Domain/`, `src/repository/`) é o que confirma essa estrutura hierárquica pro Python. É graças a ele que imports como `from ..database.config import conectar` funcionam — o `..` só faz sentido `"subir um nível"` se o Python já sabe que aquilo tudo é uma árvore de pacotes conectados.
 
 Resumindo: toda pasta que vai conter código que se `importa` entre si `(ou que será importada de fora)` precisa de um `__init__.py`. Por isso, `src/api/` também vai precisar do dela, assim que você criar essa pasta.
+
+# Erro 3 Falha no Push
+
+- Push falhou ao enviar os commits para o github falando que tinha commits que estavam no github que não estavam no meu Mac.
+
+## Solução
+
+- Usei o comando :
+
+```
+git pull --rebase origin main
+```
+
+- Que serve para baixar as mudanças que estão no Github e reorganizar meus commits locais por cima deles, assim mantendo o histórico mais limpo.
+
+1. `git pull ->` busca mudancas do repositório remoto e integra com seu código atual
+2. `origin ->` é o nome padrão do repositório, normalmente o Github
+3. `main ->` é a branch que você quer atualizar
+4. `--rebase ->` em vez de criar um novo commit de `merge`, ele coloca seus commits locais depois dos commits que vieram do Github
