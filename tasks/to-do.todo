@@ -11,4 +11,6 @@ API-Financeira-Pessoal:
     ✔ Ajusatar a nova modificacao no documento de arquitetura do projeto @done(26-08-16 19:26)
 
  API (FastAPI) Check:
-   ☐ Comeco a criacao do CRUD de Transacao
+   ✔ Comeco a criacao do CRUD de Transacao @done(26-08-18 09:11)
+   ☐ Implementado a API com FastAPI
+   

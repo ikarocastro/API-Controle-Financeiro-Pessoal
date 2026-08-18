@@ -419,3 +419,34 @@ pytest
 
 - Por padrão, o `pytest` só reconhece arquivos que começam com `test_` ou terminam com `_test.py`.
 
+# O que é FastAPI
+
+- É um framework Python pra criar APIs web — ou seja, o código que fica "escutando" na internet (ou na sua máquina) esperando requisições HTTP, e respondendo com dados (geralmente em JSON).
+
+- Pensa numa analogia com o que você já construiu: o Repository é como um "balcão de atendimento interno" — só o próprio código Python consegue chamar `criar_conta(nome)`. A API é como abrir uddizesse balcão pro mundo externo — agora alguém usando um navegador, um app de celular, ou uma ferramenta como Postman/Insomnia consegue mandar uma requisição HTTP e receber uma resposta, sem precisar saber Python nem importar nada.
+
+# Os conceitos centrais que você vai usar:
+
+- `Rota (endpoint)`— uma URL que responde a um tipo de requisição, tipo `POST /contas` (criar conta) ou `GET /contas/1` (buscar conta com id 1).
+
+- `Verbo HTTP` — cada rota tem uma "ação" associada: `GET (buscar/ler)`, `POST (criar)`, `PUT/PATCH (atualizar)`, `DELETE (remover)`. Você já tem funções que mapeiam quase direto pra esses verbos: criar_conta → POST, buscar_conta_por_id → GET.
+- `JSON` — o formato que a API usa pra `"conversar"` com quem fizer a requisição (tanto pra receber dados quanto pra devolver).
+
+- Criar conta seria um POST,  consultar saldo é um GET,  Registrar transação seria um POST e ver historico seria um GET
+
+Um padrão bem comum em `APIs REST` é organizar as rotas em torno dos recursos `(as entidades: contas, transacoes)`, assim:
+
+```
+Criar conta → POST /contas
+Registrar transação → POST /transacoes
+Consultar saldo → GET /contas/{id}/saldo (o saldo é "de uma conta específica", por isso o id aparece na URL)
+Ver histórico → GET /contas/{id}/transacoes (histórico também é "de uma conta específica")
+```
+- Repara no padrão `{id}` — isso se chama parâmetro de rota `(path parameter)`: é uma parte variável da URL, que o FastAPI extrai automaticamente e entrega pra sua função como se fosse um argumento comum.
+
+- O FastAPI, sozinho, só define como construir a API — mas pra ela realmente "rodar" e "escutar" requisições, você precisa de um servidor por baixo. O mais comum, e que a documentação oficial do FastAPI recomenda, é o uvicorn. Instala ele também
+
+## O que o __init__.py faz
+
+- Como vamos utilizar ele novamente, Ele é um arquivo (geralmente vazio, ou quase) que marca uma pasta como um `pacote Python`. Sem ele, o Python trata a pasta só como `"uma pasta comum"` — e não consegue fazer certos tipos de `import relativo` (aqueles com `.` ou `..`) de dentro dela nem através dela.
+

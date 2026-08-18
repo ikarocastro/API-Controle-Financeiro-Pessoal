@@ -17,3 +17,24 @@
 - Erro: `NameError: name 'transacoes_da_conta' is not defined`
 - Causa: `O for de teste, no final de transacao_repository.py, estava fora da indentação do if __name__ == "__main__" — rodava mesmo quando o arquivo era só importado (não executado direto)`
 - Solução: `Indentado o for/print pra dentro do if`
+
+
+## Erro 2 Falha nos imports + __init__.py
+
+O que o `__init__.py` faz
+
+Ele é um arquivo (geralmente vazio, ou quase) que marca uma pasta como um `pacote Python`. Sem ele, o Python trata a pasta só como `"uma pasta comum"` — e não consegue fazer certos tipos de `import relativo` (aqueles com `.` ou `..`) de dentro dela nem através dela.
+
+Por que isso importava no seu projeto:
+
+Lembra dos erros que você teve? Quando você tentou rodar `python3 -m src.repository.conta_repository`, o Python precisava entender que:
+
+```
+src é um pacote
+repository é um pacote dentro de src
+conta_repository é um módulo dentro desse pacote
+```
+
+Cada `__init__.py` (em `src/`, `src/database/`, `src/Domain/`, `src/repository/`) é o que confirma essa estrutura hierárquica pro Python. É graças a ele que imports como `from ..database.config import conectar` funcionam — o `..` só faz sentido `"subir um nível"` se o Python já sabe que aquilo tudo é uma árvore de pacotes conectados.
+
+Resumindo: toda pasta que vai conter código que se `importa` entre si `(ou que será importada de fora)` precisa de um `__init__.py`. Por isso, `src/api/` também vai precisar do dela, assim que você criar essa pasta.

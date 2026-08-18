@@ -141,3 +141,12 @@ Agora vamos usar essas variáveis pra realmente abrir a conexão com o ``connect
 - ``teste`` não pertence a nenhuma das duas camadas, então merece viver em outro lugar, não misturado com o código de produção do ``Repository`` ou do ``Domínio.`` 
 
 - separar ``src/`` (código-fonte de produção) de uma área de testes é exatamente como projetos profissionais se organizam. ``src/`` fica "puro", só com o que realmente compõe o sistema.
+
+# API
+
+- Mapeamento dos Requisitos para verbos HTTP
+
+1. Criar conta seria um POST
+2. consultar saldo é um GET
+3. Registrar transação seria um POST
+4. historico seria um GET
